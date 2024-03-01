@@ -1,0 +1,30 @@
+---
+- hosts: grafana_server
+  become: true
+  gather_facts: yes
+  vars:
+    ansible_become_password: "grafana"
+  tasks:
+    - name: Gathering Facts
+      setup:
+    # - name: Uninstall grafana test
+    #  yum:
+    #    name: grafana
+    #    state: absent
+    - name: Install grafana
+      yum:
+        name: grafana
+        state: present
+    - name: Start grafana on systemd
+      service:
+        name: grafana-server
+        state: started
+        enabled: yes
+      when: ansible_service_mgr == "systemd"
+
+    - name: Open Firewall for grafana
+      firewalld:
+        port: 3000/tcp
+        state: enabled
+        permanent: yes
+
